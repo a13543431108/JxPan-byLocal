@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { width: 260px; padding: 10px; font-family: "Segoe UI", sans-serif; }
+    label { font-size: 12px; display: block; margin-top: 6px; }
+    input { width: 100%; margin: 3px 0; padding: 4px; box-sizing: border-box; }
+    button { width: 100%; padding: 5px; background: #0078d4; color: white; border: none; cursor: pointer; margin-top: 4px; }
+    .status { font-size: 11px; margin: 4px 0; padding: 4px; border-radius: 3px; text-align: center; }
+    .online { background: #d4edda; color: #155724; }
+    .offline { background: #f8d7da; color: #721c24; }
+    .launch-btn { background: #28a745; }
+    .launch-btn:hover { background: #218838; }
+    .browse-btn { background: #6c757d; }
+    .browse-btn:hover { background: #5a6268; }
+    .divider { border-top: 1px solid #ddd; margin: 8px 0; }
+    .file-path { font-size: 10px; color: #666; word-break: break-all; margin: 2px 0; }
+  </style>
+</head>
+<body>
+  <div class="status" id="statusText">检测中...</div>
+
+  <label>下载器程序路径：</label>
+  <input type="text" id="downloaderPath" placeholder="例如: D:\下载器\下载器.exe">
+  <button class="browse-btn" id="browseBtn">浏览选择</button>
+
+  <div class="divider"></div>
+
+  <label>本地服务器地址：</label>
+  <input type="text" id="server" value="http://127.0.0.1:9876">
+
+  <button id="launchBtn" class="launch-btn">启动下载器</button>
+  <button id="save">保存设置</button>
+  <script src="popup.js"></script>
+</body>
+</html>

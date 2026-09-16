@@ -1,0 +1,9 @@
+{
+  "name": "com.smartdownloader",
+  "description": "Smart Downloader Native Messaging Host",
+  "path": "..\\下载器20.exe",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://__EXTENSION_ID__/"
+  ]
+}

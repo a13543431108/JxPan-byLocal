@@ -1,168 +1,146 @@
-## 📖 项目简介
+# CUCKOO.md
 
-**JxPan** 是一个基于 Cloudflare Workers 平台的网盘直链解析工具。它能够解析主流网盘分享链接，提取文件真实下载地址，并通过 JSON 格式输出或 302 重定向直接下载，有效绕过网盘客户端限制。
+## 项目概述
 
-- 🖥️ **Demo 演示站点**：<https://jx.fsapk.xx.kg>
-  - 🔑 **演示账号**：`admin`
-  - 🔑 **演示密码**：`admin`
-  - ⚠️ 演示站仅用于功能体验，数据会定期清理
+**Smart Downloader** 是一个功能强大的多协议下载工具，支持 HTTP/HTTPS、FTP 等协议的多线程分块下载，并集成浏览器扩展实现自动捕获下载链接。项目采用 Python + Tkinter 构建 GUI，配合 Edge 浏览器扩展提供完整的下载管理解决方案。
 
-### ✨ 核心特性
+## 核心功能
 
-- 🔗 **直链解析**：支持解析网盘分享链接，获取文件真实下载直链
-- 📡 **JSON 输出**：标准化 API 响应，方便二次开发集成
-- 🔄 **302 重定向**：支持直接重定向到下载地址，实现无缝下载体验
-- 🛡️ **边缘计算**：基于 Cloudflare Workers 平台，避免 IP 封禁
-- ⚡ **高速稳定**：利用 CF 全球网络，解析速度快、可用性高
-- 🌍 **全球访问**：自动选择最优节点，无视地域限制
-- 📊 **统计功能**：记录解析次数、成功/失败次数
-- 💾 **D1 数据库存储**：使用 Cloudflare D1 SQL 数据库存储数据
-- 🔐 **数据加密**：所有敏感数据 AES 加密存储
+- **多协议下载**：支持 HTTP/HTTPS、FTP 协议，自动识别 Content-Disposition 文件名
+- **多线程分块下载**：支持动态块分裂与工作窃取算法，充分利用带宽资源
+- **断点续传**：支持暂停/恢复下载，任务状态持久化到 resume_info.json
+- **浏览器集成**：Edge 扩展通过 Native Messaging 与主程序通信，自动捕获下载链接
+- **云盘支持**：夸克网盘、UC网盘、天翼云盘、移动云盘、光鸭云盘、123云盘、阿里云盘
+- **哈希校验**：支持 MD5/SHA1/SHA256 文件完整性校验
+- **DNS 缓存**：线程安全的 DNS 缓存，减少域名解析开销
 
-***
+## 技术栈
 
-## 🚀 支持平台
+| 组件 | 技术 |
+|------|------|
+| GUI | Tkinter + ttk |
+| 网络请求 | requests / urllib3 |
+| 多线程 | threading + concurrent.futures |
+| 打包 | PyInstaller |
+| 浏览器扩展 | Manifest V3 (Edge) |
+| Native Messaging | Windows 注册表 + JSON 配置 |
+| 云盘 API | 各网盘开放接口 / Cookie 模拟 |
 
-| 平台     | 域名                           | 状态    | 扫码登录  |
-| ------ | ---------------------------- | ----- | ----- |
-| 阿里云盘   | alipan.com / aliyundrive.com | ✅ 已支持 | ✅ 支持  |
-| 夸克网盘   | pan.quark.cn                 | ✅ 已支持 | ✅ 支持  |
-| UC网盘   | drive.uc.cn / fast.uc.cn     | ✅ 已支持 | ✅ 支持  |
-| 移动云盘   | yun.139.com / caiyun.139.com | ✅ 已支持 | ❌ 不支持 |
-| 天翼云盘   | cloud.189.cn                 | ✅ 已支持 | ✅ 支持  |
-| 123云盘  | 123pan.cn                    | ✅ 已支持 | ❌ 不支持 |
-| 小飞机网盘  | feijipan.com                 | ✅ 已支持 | -     |
-| 蓝奏云优享版 | ilanzou.com                  | ✅ 已支持 | -     |
-| 蓝奏云    | lanzou\*.com                 | ✅ 已支持 | -     |
-| 光鸭云盘   | guangyapan.com               | ✅ 已支持 | ✅ 支持  |
+## 项目结构
 
-> **注意**：\
-> 阿里云盘、夸克网盘、UC网盘、移动云盘、天翼云盘、光鸭云盘、123云盘需要配置认证信息才能正常解析。推荐使用后台管理面板的扫码登录功能快速配置。\
-> *123云盘需要配置 Token 才能下载文件（免费用户每日有10G下载流量）*\
-> *小飞机网盘需要配置账号信息才能解析大文件（＞500MB）*
+```
+下载器21/
+├── 下载器.py                 # 主程序 (约 4700+ 行)
+├── cloud_drive_manager.py    # 云盘账号管理模块 (约 1090 行)
+├── setup_downloader.py       # 一键安装工具 (Native Messaging 注册)
+├── build.py                  # PyInstaller 打包脚本
+├── 下载器.spec               # PyInstaller 规格文件
+├── setup_downloader.spec     # 安装工具规格文件
+├── d.ico                     # 程序图标
+├── cloud_drive_accounts.json # 云盘账号配置文件 (运行时生成)
+├── resume_info.json          # 下载任务断点信息 (运行时生成)
+├── download with edge/       # Edge 浏览器扩展
+│   ├── manifest.json         # 扩展清单 (Manifest V3)
+│   ├── background.js         # Service Worker (后台脚本)
+│   ├── popup.html            # 弹出界面
+│   ├── popup.js              # 弹出界面逻辑
+│   ├── icon.png              # 扩展图标
+│   ├── com.smartdownloader.json # Native Messaging 主机配置
+│   └── install_host.bat      # 主机注册脚本
+├── JxPan-main/               # JxPan 本地服务器 (云盘解析)
+│   ├── jxpan-local-server.js # 本地服务器
+│   └── 未加密源码.js          # 解析核心
+├── node/                     # Node.js 运行时 (用于 JxPan)
+│   └── node.exe
+├── NSIS打包/                 # NSIS 安装包构建目录
+│   ├── 下载器安装器.nsi      # NSIS 脚本
+│   └── dist/                 # 打包输出目录
+├── __pycache__/              # Python 字节码缓存
+└── 下载器.exe                # 打包后的可执行文件 (若已构建)
+```
 
-***
+## 关键模块说明
 
-## 💡 快速部署
+### 下载器.py (主程序)
 
-### ⚙️ Workers 部署
+- **DownloadTask 类**：核心下载任务类，支持多协议、多线程分块下载
+  - 工作窃取算法：动态平衡各线程负载
+  - 块分裂机制：慢速块自动分裂，提升并行度
+  - 断点续传：任务状态持久化
+- **DNS 缓存**：通过 monkey-patch socket.getaddrinfo 实现线程安全的 LRU 缓存
+- **GUI 界面**：任务列表、进度条、速度显示、日志输出
 
-#### 1. 创建 Worker
+### cloud_drive_manager.py
 
-1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com)，进入 **Workers & Pages**
-2. 点击 "创建服务"，输入服务名称（如 `jxpan`），点击 "创建服务"
+- 支持 7 种云盘的登录与文件管理
+- 使用 Cookie/Token 方式登录，配置保存在本地 JSON
+- 提供文件列表、下载链接解析等功能
 
-#### 2. 上传代码
+### setup_downloader.py
 
-1. 进入 Worker 编辑页面，点击 "编辑代码"
-2. 将 `_worker.js` 的完整代码粘贴到编辑器中
-3. 点击 "保存并部署"
+- 自动注册 Native Messaging 主机
+- 写入 Windows 注册表，让 Edge 扩展能启动主程序
+- 兼容开发环境和打包环境
 
-#### 3. 配置 D1 数据库（必需）
+### Edge 浏览器扩展
 
-本项目使用 **Cloudflare D1 SQL 数据库** 存储数据（扫码登录信息、统计数据等）。
+- 通过 webRequest API 拦截下载请求
+- 通过 Native Messaging 与本地主程序通信
+- 将捕获的下载链接发送给主程序进行下载
 
-1. 在 Cloudflare Dashboard 中，进入 **"储存和数据库" → "D1 SQL 数据库"**
-2. 点击 **"创建数据库"**，输入名称 `jxpan`
-3. 创建完成后，进入 **"Workers & Pages" → 你的 Worker → 设置 → 绑定"**
-4. 点击 **"添加绑定" → 选择 "D1 数据库"**
-5. 变量名称填写 `jxpan`，选择刚创建的数据库
-6. 点击 **"添加绑定"**
+## 构建与运行
 
-> D1 数据库表会在首次请求时自动创建，无需手动执行 SQL。
+### 开发环境运行
 
-#### 4. 配置环境变量（可选）
+```bash
+# 安装依赖
+pip install requests psutil pyinstaller
 
-对于需要认证的网盘，可以配置以下环境变量：
+# 运行主程序
+python 下载器.py
 
-| 变量名                    | 说明                        | 适用平台 |
-| ---------------------- | ------------------------- | ---- |
-| `ALIYUN_AUTHORIZATION` | 阿里云盘的 Authorization Token | 阿里云盘 |
-| `QK_COOKIE`            | 夸克网盘的 Cookie              | 夸克网盘 |
-| `UC_COOKIE`            | UC网盘的 Cookie              | UC网盘 |
-| `MCLOUD_AUTHORIZATION` | 移动云盘的 Authorization Token | 移动云盘 |
-| `CLOUD189_TOKEN`       | 天翼云盘的 AccessToken         | 天翼云盘 |
-| `PAN123_TOKEN`         | 123云盘的 Authorization Token | 123云盘 |
-| `GY_Login`             | 光鸭云盘的登录信息 JSON            | 光鸭云盘 |
+# 注册浏览器扩展 (管理员权限)
+python setup_downloader.py
+```
 
-配置方法：
+### 打包为 EXE
 
-1. 在 Worker 页面点击 **"设置" → "变量"**
-2. 点击 **"添加变量"**，输入变量名和值
-3. 点击 **"保存"**
+```bash
+# 使用 PyInstaller 打包
+python build.py
+# 或直接使用 spec 文件
+pyinstaller 下载器.spec
+```
 
-> **推荐**：通过后台管理面板 `/admin` 的扫码登录功能配置，无需手动填写环境变量。
+### NSIS 安装包构建
 
-#### 5. 绑定自定义域（推荐）
+```bash
+# 使用 NSIS 编译安装脚本
+makensis NSIS打包/下载器安装器.nsi
+```
 
-1. 在 **"触发器"** 选项卡点击 **"添加自定义域"**
-2. 输入您的域名（如 `pan.yourdomain.com`），点击 **"添加自定义域"**
-3. 按提示完成 DNS 解析，等待证书生效
+## 配置说明
 
-#### 6. 配置后台管理面板（可选）
+| 文件 | 用途 |
+|------|------|
+| cloud_drive_accounts.json | 云盘账号 Cookie/Token 存储 |
+| resume_info.json | 下载任务断点续传信息 |
+| com.smartdownloader.json | Native Messaging 主机路径配置 |
 
-为了启用后台管理面板，需要配置以下环境变量：
+## 依赖项
 
-| 变量名     | 说明      |
-| ------- | ------- |
-| `admin` | 后台登录用户名 |
-| `pass`  | 后台登录密码  |
+- Python 3.7+
+- requests
+- psutil
+- pyinstaller (仅打包时需要)
+- Edge 浏览器 (扩展需要)
 
-配置方法同上。
+## 注意事项
 
-#### 7. 访问测试
+1. 浏览器扩展需要管理员权限注册 Native Messaging 主机
+2. 云盘 Cookie 有效期有限，需定期更新
+3. 下载大文件时建议保持网络稳定，避免频繁暂停/恢复
 
-- 访问 `https://your-domain.com/` 查看使用说明
-- 访问 `https://your-domain.com/?url=分享链接` 进行解析测试
-- 访问 `https://your-domain.com/admin` 进入后台管理面板
-  - 演示站账号：`admin`
-  - 演示站密码：`admin`
+---
 
-***
-
-## 📱 扫码登录功能
-
-后台管理面板 (`/admin`) 提供了便捷的扫码登录功能，支持以下网盘：
-
-### 支持扫码登录的平台
-
-| 平台    | 登录方式         | 存储位置   |
-| ----- | ------------ | ------ |
-| 阿里云盘  | 阿里云盘 APP 扫码  | D1     |
-| 天翼云盘  | 天翼云盘 APP 扫码  | D1     |
-| 光鸭云盘  | 手机号+验证码      | D1     |
-| 夸克网盘  | 夸克 APP 扫码    | D1     |
-| UC网盘  | UC APP 扫码    | D1     |
-| 123云盘 | 手动输入 Token   | D1     |
-
-### 使用方式
-
-1. 访问 `https://your-domain.com/admin`
-2. 使用管理员账号登录
-3. 进入 **"控制面板"** 或 **"扫码登录"** 标签页
-4. 点击对应网盘的 **"扫码登录"** 按钮
-5. 使用对应网盘 APP 扫描二维码
-6. 扫码成功后自动保存登录信息到 D1 数据库
-7. 解析时自动优先使用扫码登录的配置信息
-
-### 前端页面配置
-
-前端解析页面也提供了手动配置入口（JSON 输入框）：
-
-- **阿里云盘**：Authorization 手动输入
-- **夸克网盘**：Cookie 手动输入
-- **UC网盘**：Cookie 手动输入
-- **移动云盘**：Authorization + Cookie 手动输入
-- **天翼云盘**：AccessToken 手动输入
-- **123云盘**：Token 手动输入
-- **光鸭云盘**：登录信息 JSON 手动输入
-
-配置优先级：**扫码登录（容易失效） > 前端手动输入 > 环境变量（兜底）**
-
-***
-
-## 📚 API 使用文档
-
-### 基础接口
-
-#### 1. 解析接口（JSON 返回）
+*本文档由 CUCKOO.md 自动生成，基于项目实际代码结构编写。*
